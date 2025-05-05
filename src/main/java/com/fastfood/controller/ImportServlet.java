@@ -2,92 +2,76 @@ package com.fastfood.controller;
 
 import com.fastfood.dao.IngredientDAO;
 import com.fastfood.model.Ingredient;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
 import java.io.IOException;
-import java.util.*;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 
 @WebServlet("/ImportServlet")
 public class ImportServlet extends HttpServlet {
-
-    private IngredientDAO ingredientDAO = new IngredientDAO();
-
-    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String action = request.getParameter("action");
-        String searchName = request.getParameter("searchName");
+        String keyword = request.getParameter("keyword");
+        String supplierIdStr = request.getParameter("supplierId");
+        int supplierId = Integer.parseInt(supplierIdStr);
+        List<Ingredient> ingredientList = new ArrayList<>();
 
-        if ("search".equals(action) && searchName != null) {
-            List<Ingredient> searchResults = ingredientDAO.getIngredientByName(searchName);
-            request.setAttribute("searchResults", searchResults);
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            IngredientDAO dao = new IngredientDAO();
+            ingredientList = dao.getIngredientByName(keyword, supplierId);
         }
 
-        HttpSession session = request.getSession();
-
-        Map<Integer, Ingredient> selectedIngredients = (Map<Integer, Ingredient>) session.getAttribute("selectedIngredients");
-        Map<Integer, Integer> selectedQuantities = (Map<Integer, Integer>) session.getAttribute("selectedQuantities");
-
-        if (selectedIngredients == null) selectedIngredients = new HashMap<>();
-        if (selectedQuantities == null) selectedQuantities = new HashMap<>();
-
-        request.setAttribute("selectedIngredients", selectedIngredients);
-        request.setAttribute("selectedQuantities", selectedQuantities);
-
-        double totalPrice = 0;
-        for (Map.Entry<Integer, Integer> entry : selectedQuantities.entrySet()) {
-            int id = entry.getKey();
-            int qty = entry.getValue();
-            Ingredient ing = selectedIngredients.get(id);
-            if (ing != null) {
-                totalPrice += ing.getPrice() * qty;
-            }
-        }
-        request.setAttribute("totalPrice", totalPrice);
-
+        request.setAttribute("ingredientList", ingredientList);
+        request.setAttribute("keyword", keyword);
         request.getRequestDispatcher("Import.jsp").forward(request, response);
     }
 
-    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
+        String supplierId = request.getParameter("supplierId");
+        String keyword = request.getParameter("keyword");
         HttpSession session = request.getSession();
+        List<Ingredient> selectedIngredients = (List<Ingredient>) session.getAttribute("selectedIngredients");
+        List<Integer> quantities = (List<Integer>) session.getAttribute("quantities");
 
-        Map<Integer, Ingredient> selectedIngredients = (Map<Integer, Ingredient>) session.getAttribute("selectedIngredients");
-        Map<Integer, Integer> selectedQuantities = (Map<Integer, Integer>) session.getAttribute("selectedQuantities");
-
-        if (selectedIngredients == null) selectedIngredients = new HashMap<>();
-        if (selectedQuantities == null) selectedQuantities = new HashMap<>();
-
-        if ("add".equals(action)) {
-            int id = Integer.parseInt(request.getParameter("idIngredient"));
-            Ingredient ing = ingredientDAO.getIngredientById(id);
-            if (ing != null) {
-                selectedIngredients.putIfAbsent(id, ing);
-                selectedQuantities.put(id, selectedQuantities.getOrDefault(id, 0) + 1);
-            }
-        } else if ("remove".equals(action)) {
-            int id = Integer.parseInt(request.getParameter("idIngredient"));
-            selectedIngredients.remove(id);
-            selectedQuantities.remove(id);
-        } else if ("confirm".equals(action)) {
-            System.out.println("Confirmed import:");
-            for (Map.Entry<Integer, Integer> entry : selectedQuantities.entrySet()) {
-                int id = entry.getKey();
-                int qty = entry.getValue();
-                Ingredient ing = selectedIngredients.get(id);
-                if (ing != null) {
-                    System.out.println(ing.getName() + " x " + qty);
-                }
-            }
-            selectedIngredients.clear();
-            selectedQuantities.clear();
+        if (selectedIngredients == null) {
+            selectedIngredients = new ArrayList<>();
+            quantities = new ArrayList<>();
+            session.setAttribute("selectedIngredients", selectedIngredients);
+            session.setAttribute("quantities", quantities);
         }
 
-        session.setAttribute("selectedIngredients", selectedIngredients);
-        session.setAttribute("selectedQuantities", selectedQuantities);
+        IngredientDAO dao = new IngredientDAO();
+        if ("add".equals(action)) {
+            int ingredientId = Integer.parseInt(request.getParameter("ingredientId"));
+            Ingredient ingredient = dao.getIngredientById(ingredientId);
+            if (ingredient != null && !selectedIngredients.contains(ingredient)) {
+                selectedIngredients.add(ingredient);
+                quantities.add(1); // Mặc định số lượng là 1
+            }
+        } else if ("update".equals(action)) {
+            int index = Integer.parseInt(request.getParameter("index"));
+            int quantity = Integer.parseInt(request.getParameter("quantity"));
+            if (quantity > 0) {
+                quantities.set(index, quantity);
+            }
+        } else if ("remove".equals(action)) {
+            int index = Integer.parseInt(request.getParameter("index"));
+            selectedIngredients.remove(index);
+            quantities.remove(index);
+        }
 
-        response.sendRedirect("ImportServlet");
+        // Chuyển hướng với supplierId và keyword
+        String redirectUrl = "ImportServlet?supplierId=" + supplierId;
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            redirectUrl += "&keyword=" + URLEncoder.encode(keyword, "UTF-8");
+        }
+        response.sendRedirect(redirectUrl);
     }
 }
