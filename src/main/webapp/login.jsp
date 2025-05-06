@@ -24,6 +24,12 @@
             text-align: center;
             margin-bottom: 20px;
         }
+        .error-message {
+            color: #d32f2f;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
         input[type="text"], input[type="password"] {
             width: 100%;
             padding: 10px;
@@ -54,6 +60,18 @@
 
 <div class="login-container">
     <h2>Đăng nhập</h2>
+    <%
+        String error = request.getParameter("error");
+        if ("true".equals(error)) {
+    %>
+    <div class="error-message">Tên đăng nhập hoặc mật khẩu không đúng</div>
+    <%
+    } else if ("unknown_role".equals(error)) {
+    %>
+    <div class="error-message">Vai trò không hợp lệ</div>
+    <%
+        }
+    %>
     <form action="LoginServlet" method="post">
         <input type="text" name="username" placeholder="Tên đăng nhập" required>
         <input type="password" name="password" placeholder="Mật khẩu" required>

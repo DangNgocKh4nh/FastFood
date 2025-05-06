@@ -53,6 +53,12 @@
             <version>5.0.0</version> <!-- hoặc 6.0.0 nếu Tomcat 10.1+ -->
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20231013</version>
+        </dependency>
+
     </dependencies>
 
     <build>

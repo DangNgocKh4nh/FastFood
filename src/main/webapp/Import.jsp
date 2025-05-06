@@ -8,7 +8,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin:  Ascendancy;
+            margin: 40px;
             background-color: #f4f6f8;
         }
         h1 {
@@ -123,8 +123,55 @@
             background-color: #666;
         }
     </style>
+    <script>
+        function updateQuantity(index, quantity, supplierId, keyword) {
+            if (quantity < 1) {
+                alert("Số lượng phải lớn hơn 0!");
+                return;
+            }
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "ImportServlet", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+
+            var data = "action=update&index=" + index + "&quantity=" + quantity +
+                "&supplierId=" + encodeURIComponent(supplierId) +
+                "&keyword=" + encodeURIComponent(keyword);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    if (response.success) {
+                        // Cập nhật số lượng trên giao diện
+                        document.getElementById("quantity-" + response.index).value = response.quantity;
+                        // Cập nhật tổng tiền
+                        document.getElementById("total-box").textContent = "Tổng tiền: " + response.total.toFixed(2) + " VNĐ";
+                    } else {
+                        alert("Cập nhật số lượng thất bại!");
+                    }
+                }
+            };
+
+            xhr.send(data);
+        }
+    </script>
 </head>
 <body>
+<div style="position: absolute; top: 10px; right: 20px;">
+    <form action="login.jsp" method="get" style="display:inline;">
+        <button type="submit" style="
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        ">
+            Đăng xuất
+        </button>
+    </form>
+</div>
 <h1>Nhập Nguyên Liệu</h1>
 
 <form action="ImportServlet" method="get" class="search-box">
@@ -179,12 +226,13 @@
             <p>Giá nhập: <%= String.format("%.2f", ingredient.getPrice()) %> VNĐ</p>
         </div>
         <div>
-            <form action="ImportServlet" method="post">
+            <form>
                 <input type="hidden" name="action" value="update">
                 <input type="hidden" name="supplierId" value="<%= request.getParameter("supplierId") %>">
                 <input type="hidden" name="index" value="<%= i %>">
                 <input type="hidden" name="keyword" value="<%= keyword != null ? keyword : "" %>">
-                <input type="number" name="quantity" value="<%= quantity %>" min="1" onchange="this.form.submit()">
+                <input type="number" id="quantity-<%= i %>" name="quantity" value="<%= quantity %>" min="1"
+                       oninput="updateQuantity(<%= i %>, this.value, '<%= request.getParameter("supplierId") %>', '<%= keyword != null ? keyword : "" %>')">
             </form>
             <form action="ImportServlet" method="post">
                 <input type="hidden" name="action" value="remove">
@@ -201,12 +249,17 @@
     <% } %>
 </div>
 
-<div class="total-box">
-    Tổng tiền: <%= String.format("%.2f", total) %> VNĐ
+<div class="total-box" id="total-box">
+    Total money: <%= String.format("%.2f", total) %> VND
 </div>
 
 <div class="action-buttons">
-    <button class="confirm" onclick="alert('Xác nhận thành công!')">Xác nhận</button>
+    <form action="ImportServlet" method="post">
+        <input type="hidden" name="action" value="confirm">
+        <input type="hidden" name="supplierId" value="<%= request.getParameter("supplierId") %>">
+        <input type="hidden" name="keyword" value="<%= keyword != null ? keyword : "" %>">
+        <button type="submit" class="confirm">Xác nhận</button>
+    </form>
     <a href="SelectSupplier.jsp"><button class="back">Quay lại</button></a>
 </div>
 

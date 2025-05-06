@@ -76,6 +76,20 @@
     </style>
 </head>
 <body>
+<div style="position: absolute; top: 10px; right: 20px;">
+    <form action="login.jsp" method="get" style="display:inline;">
+        <button type="submit" style="
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        ">
+            Đăng xuất
+        </button>
+    </form>
+</div>
 <h1>Chọn Nhà Cung Cấp</h1>
 
 <form action="SelectSupplierServlet" method="get" class="search-box">
