@@ -79,6 +79,7 @@
         <input type="password" name="confirmPassword" placeholder="Xác nhận mật khẩu" required>
         <button type="submit">Đăng ký</button>
     </form>
+    <a href="login.jsp"><button class="back">Quay lại</button></a>
 </div>
 
 </body>

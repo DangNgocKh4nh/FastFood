@@ -92,15 +92,9 @@ public class ImportServlet extends HttpServlet {
             int index = Integer.parseInt(request.getParameter("index"));
             selectedIngredients.remove(index);
             quantities.remove(index);
-        } else if ("confirm".equals(action)) {
-            // Chuyển tiếp đến PrintInvoice.jsp
-            request.setAttribute("supplierId", supplierId);
-            request.setAttribute("keyword", keyword);
-            request.getRequestDispatcher("PrintInvoice.jsp").forward(request, response);
-            return; // Kết thúc xử lý, không chuyển hướng
         }
 
-        // Chuyển hướng cho các hành động không phải AJAX hoặc confirm
+        // Chuyển hướng cho các hành động
         String redirectUrl = "ImportServlet?supplierId=" + supplierId;
         if (keyword != null && !keyword.trim().isEmpty()) {
             redirectUrl += "&keyword=" + URLEncoder.encode(keyword, "UTF-8");

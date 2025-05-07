@@ -122,13 +122,15 @@
         .action-buttons .back:hover {
             background-color: #666;
         }
+        .error-message {
+            text-align: center;
+            color: #f44336;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
     </style>
     <script>
         function updateQuantity(index, quantity, supplierId, keyword) {
-            if (quantity < 1) {
-                alert("Số lượng phải lớn hơn 0!");
-                return;
-            }
 
             var xhr = new XMLHttpRequest();
             xhr.open("POST", "ImportServlet", true);
@@ -158,6 +160,12 @@
     </script>
 </head>
 <body>
+<%
+    if (session.getAttribute("manager") == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+%>
 <div style="position: absolute; top: 10px; right: 20px;">
     <form action="login.jsp" method="get" style="display:inline;">
         <button type="submit" style="
@@ -173,6 +181,15 @@
     </form>
 </div>
 <h1>Nhập Nguyên Liệu</h1>
+
+<%
+    String error = (String) request.getAttribute("error");
+    if (error != null) {
+%>
+<div class="error-message">
+    <%= error %>
+</div>
+<% } %>
 
 <form action="ImportServlet" method="get" class="search-box">
     <input type="hidden" name="supplierId" value="<%= request.getParameter("supplierId") %>">
@@ -250,15 +267,15 @@
 </div>
 
 <div class="total-box" id="total-box">
-    Total money: <%= String.format("%.2f", total) %> VND
+    Tổng tiền: <%= String.format("%.2f", total) %> VNĐ
 </div>
 
 <div class="action-buttons">
-    <form action="ImportServlet" method="post">
+    <form action="ConfirmImportServlet" method="post">
         <input type="hidden" name="action" value="confirm">
         <input type="hidden" name="supplierId" value="<%= request.getParameter("supplierId") %>">
         <input type="hidden" name="keyword" value="<%= keyword != null ? keyword : "" %>">
-        <button type="submit" class="confirm">Xác nhận</button>
+        <button type="submit" class="confirm" <%= (selectedIngredients == null || selectedIngredients.isEmpty()) ? "disabled" : "" %>>Xác nhận</button>
     </form>
     <a href="SelectSupplier.jsp"><button class="back">Quay lại</button></a>
 </div>

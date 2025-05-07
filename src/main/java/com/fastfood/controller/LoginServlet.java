@@ -1,7 +1,9 @@
 package com.fastfood.controller;
 
+import com.fastfood.dao.ManagerDAO;
 import com.fastfood.dao.UserDAO;
 import com.fastfood.dao.CustomerDAO;
+import com.fastfood.model.Manager;
 import com.fastfood.model.User;
 import com.fastfood.model.Customer;
 
@@ -35,6 +37,11 @@ public class LoginServlet extends HttpServlet {
                 }
                 response.sendRedirect("Order.jsp");
             } else if ("manager".equalsIgnoreCase(user.getRole())) {
+                ManagerDAO managerDAO = new ManagerDAO();
+                Manager manager = managerDAO.getManagerByUserId(user.getIdUser());
+                if (manager != null) {
+                    session.setAttribute("manager", manager); // Lưu Manager
+                }
                 response.sendRedirect("SelectSupplier.jsp");
             } else {
                 response.sendRedirect("login.jsp?error=unknown_role");

@@ -4,9 +4,18 @@ import java.util.List;
 
 public class InvoiceDetail {
     private int idInvoiceDetail;
+    private int idInvoice;
     private int quantity;
     private double price;
     private List<Ingredient> ingredients;
+
+    public int getIdInvoice() {
+        return idInvoice;
+    }
+
+    public void setIdInvoice(int idInvoice) {
+        this.idInvoice = idInvoice;
+    }
 
     public int getIdInvoiceDetail() {
         return idInvoiceDetail;
