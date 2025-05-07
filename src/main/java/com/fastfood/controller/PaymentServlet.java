@@ -1,7 +1,5 @@
 package com.fastfood.controller;
 
-import com.fastfood.dao.ItemDAO;
-import com.fastfood.dao.OrderDetailDAO;
 import com.fastfood.model.Item;
 import com.fastfood.model.OrderDetail;
 import jakarta.servlet.ServletException;
@@ -23,8 +21,6 @@ public class PaymentServlet extends HttpServlet {
         HttpSession session = request.getSession();
         List<Item> selectedItems = (List<Item>) session.getAttribute("selectedItems");
         List<OrderDetail> orderDetails = new ArrayList<>();
-        OrderDetailDAO orderDetailDAO = new OrderDetailDAO();
-        ItemDAO itemDAO = new ItemDAO();
 
         if (selectedItems != null) {
             for (Item item : selectedItems) {

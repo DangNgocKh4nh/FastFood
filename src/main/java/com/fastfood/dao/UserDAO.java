@@ -33,21 +33,7 @@ public class UserDAO extends DAO {
         return user;
     }
 
-    public boolean checkLogin(String username, String password) {
-        String sql = "SELECT * FROM User WHERE Username = ? AND Password = ?";
 
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, username);
-            ps.setString(2, password);
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next(); // nếu tìm thấy 1 dòng => login thành công
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return false;
-    }
 
     public void register(User user) {
         if (this.con == null) {

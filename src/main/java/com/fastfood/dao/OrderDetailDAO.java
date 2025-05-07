@@ -18,10 +18,4 @@ public class OrderDetailDAO extends DAO {
             e.printStackTrace();
         }
     }
-
-    public OrderDetail getOrderDetail(int idOrderDetail) {
-        // Phần này bạn có thể hoàn thiện sau nếu cần lấy thông tin chi tiết từ DB
-        // Tạm thời mình để return null vì chưa có yêu cầu cụ thể
-        return null;
-    }
 }

@@ -21,30 +21,4 @@ public class InvoiceDetailDAO extends DAO {
             e.printStackTrace();
         }
     }
-
-    public InvoiceDetail getInvoiceDetail(int id) {
-        String sql = "SELECT * FROM invoicedetail WHERE IdInvoiceDetail = ?";
-        try (PreparedStatement stmt = con.prepareStatement(sql)) {
-            stmt.setInt(1, id);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                InvoiceDetail detail = new InvoiceDetail();
-                detail.setIdInvoiceDetail(rs.getInt("IdInvoiceDetail"));
-                detail.setQuantity(rs.getInt("Quantity"));
-                detail.setPrice(rs.getDouble("Price"));
-
-                // Lấy Ingredient từ IdIngredient
-                IngredientDAO ingredientDAO = new IngredientDAO();
-                Ingredient ingredient = ingredientDAO.getIngredientById(rs.getInt("IdIngredient"));
-                List<Ingredient> ingredients = new ArrayList<>();
-                ingredients.add(ingredient);
-                detail.setIngredients(ingredients);
-
-                return detail;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 }

@@ -1,7 +1,6 @@
 package com.fastfood.model;
 
 import java.util.Date;
-import java.util.List;
 
 public class Invoice {
     private int idInvoice;
@@ -9,7 +8,6 @@ public class Invoice {
     private double total;
     private Manager manager;
     private Supplier supplier;
-    private List<InvoiceDetail> invoiceDetails;
 
     public int getIdInvoice() {
         return idInvoice;
@@ -49,13 +47,5 @@ public class Invoice {
 
     public void setSupplier(Supplier supplier) {
         this.supplier = supplier;
-    }
-
-    public List<InvoiceDetail> getInvoiceDetails() {
-        return invoiceDetails;
-    }
-
-    public void setInvoiceDetails(List<InvoiceDetail> invoiceDetails) {
-        this.invoiceDetails = invoiceDetails;
     }
 }

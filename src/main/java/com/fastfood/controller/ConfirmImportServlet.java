@@ -65,9 +65,13 @@ public class ConfirmImportServlet extends HttpServlet {
         }
 
         // Tạo Supplier
-        Supplier supplier = new Supplier();
-        supplier.setIdSupplier(Integer.parseInt(supplierId));
-        supplier.setName(supplierId.equals("1") ? "Thịt gà" : "Thịt bò");
+        Supplier supplier = (Supplier) session.getAttribute("selectedSupplier");
+        if (supplier == null) {
+            LOGGER.warning("No supplier found in session");
+            request.setAttribute("error", "Vui lòng chọn nhà cung cấp!");
+            request.getRequestDispatcher("Import.jsp").forward(request, response);
+            return;
+        }
 
         // Tạo Invoice
         Invoice invoice = new Invoice();
@@ -97,7 +101,7 @@ public class ConfirmImportServlet extends HttpServlet {
             request.setAttribute("selectedIngredients", selectedIngredients);
             request.setAttribute("quantities", quantities);
             request.setAttribute("managerName", manager.getName());
-            request.setAttribute("supplierId", supplierId);
+            request.setAttribute("supplierName", supplier.getName());
             request.setAttribute("keyword", keyword);
 
             // Xóa dữ liệu trong session sau khi gửi
