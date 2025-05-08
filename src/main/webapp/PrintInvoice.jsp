@@ -83,6 +83,11 @@
     </script>
 </head>
 <body>
+<div class="logout-container">
+    <form action="login.jsp" method="get">
+        <button type="submit" class="logout-button">Đăng xuất</button>
+    </form>
+</div>
 <h1>Hóa Đơn Nhập Hàng</h1>
 
 <div class="invoice-container">
