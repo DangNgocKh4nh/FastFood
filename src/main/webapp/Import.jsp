@@ -148,7 +148,7 @@
                         // Cập nhật số lượng trên giao diện
                         document.getElementById("quantity-" + response.index).value = response.quantity;
                         // Cập nhật tổng tiền
-                        document.getElementById("total-box").textContent = "Tổng tiền: " + response.total.toFixed(2) + " VNĐ";
+                        document.getElementById("total-box").textContent = "Tổng tiền: " + response.total + " VNĐ";
                     } else {
                         alert("Cập nhật số lượng thất bại!");
                     }
@@ -208,7 +208,7 @@
     <div class="result-item">
         <div>
             <strong><%= ingredient.getName() %></strong>
-            <p>Giá nhập: <%= String.format("%.2f", ingredient.getPrice()) %> VNĐ</p>
+            <p>Giá nhập: <%= String.format("%.0f", ingredient.getPrice()) %> VNĐ</p>
         </div>
         <form action="ImportServlet" method="post">
             <input type="hidden" name="action" value="add">
@@ -229,7 +229,7 @@
     <%
         List<Ingredient> selectedIngredients = (List<Ingredient>) session.getAttribute("selectedIngredients");
         List<Integer> quantities = (List<Integer>) session.getAttribute("quantities");
-        double total = 0.0;
+        double total = 0;
         if (selectedIngredients != null && !selectedIngredients.isEmpty()) {
             for (int i = 0; i < selectedIngredients.size(); i++) {
                 Ingredient ingredient = selectedIngredients.get(i);
@@ -240,7 +240,7 @@
     <div class="selected-item">
         <div>
             <strong><%= ingredient.getName() %></strong>
-            <p>Giá nhập: <%= String.format("%.2f", ingredient.getPrice()) %> VNĐ</p>
+            <p>Giá nhập: <%= String.format("%.0f", ingredient.getPrice()) %> VNĐ</p>
         </div>
         <div>
             <form>
@@ -267,7 +267,7 @@
 </div>
 
 <div class="total-box" id="total-box">
-    Tổng tiền: <%= String.format("%.2f", total) %> VNĐ
+    Tổng tiền: <%= String.format("%.0f", total) %> VNĐ
 </div>
 
 <div class="action-buttons">

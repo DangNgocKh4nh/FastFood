@@ -203,7 +203,7 @@
         <% for (Item item : resultItems) { %>
         <tr>
             <td><%= item.getName() %></td>
-            <td><%= String.format("%.2f", item.getPrice()) %> VNĐ</td>
+            <td><%= String.format("%.0f", item.getPrice()) %> VNĐ</td>
             <td>
                 <form action="OrderServlet" method="post">
                     <input type="hidden" name="addItemId" value="<%= item.getIdItem() %>">
@@ -230,7 +230,7 @@
         <% for (Item item : selectedItems) { %>
         <tr>
             <td><%= item.getName() %></td>
-            <td><%= String.format("%.2f", item.getPrice()) %> VNĐ</td>
+            <td><%= String.format("%.0f", item.getPrice()) %> VNĐ</td>
             <td>
                 <form action="OrderServlet" method="post">
                     <input type="hidden" name="removeItemId" value="<%= item.getIdItem() %>">
