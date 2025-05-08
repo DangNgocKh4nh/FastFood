@@ -131,6 +131,13 @@
         .logout-button:hover {
             background-color: #c82333;
         }
+        .action-buttons .print {
+            background-color: #2196F3;
+            color: white;
+        }
+        .action-buttons .print:hover {
+            background-color: #1976D2;
+        }
         @media (max-width: 600px) {
             body {
                 margin: 20px;
@@ -168,6 +175,11 @@
             }
         }
     </style>
+    <script>
+        function printInvoice() {
+            window.print();
+        }
+    </script>
 </head>
 <body>
 <div class="logout-container">
@@ -215,6 +227,7 @@
     </div>
 
     <div class="action-buttons">
+        <button class="print" onclick="printInvoice()">In hóa đơn</button>
         <a href="Order.jsp"><button class="back-button">Quay về menu</button></a>
     </div>
 </div>

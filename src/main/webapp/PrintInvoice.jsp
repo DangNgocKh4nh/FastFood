@@ -75,6 +75,74 @@
         .action-buttons .back:hover {
             background-color: #666;
         }
+        .logout-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        .logout-button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: Arial, sans-serif;
+            transition: background-color 0.3s;
+        }
+        .logout-button:hover {
+            background-color: #c82333;
+        }
+        @media (max-width: 600px) {
+            body {
+                margin: 20px;
+            }
+            .invoice-container {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            table {
+                font-size: 14px;
+            }
+            th, td {
+                padding: 8px;
+            }
+            .total-box {
+                font-size: 16px;
+            }
+            .action-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .action-buttons button {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+            .logout-container {
+                position: static;
+                text-align: center;
+                margin-bottom: 30px;
+            }
+        }
+        @media print {
+            .action-buttons, .logout-container {
+                display: none !important;
+            }
+            body {
+                margin: 0;
+                background-color: white;
+            }
+            h1 {
+                font-size: 20px;
+            }
+            .invoice-container {
+                box-shadow: none;
+                padding: 10px;
+            }
+        }
     </style>
     <script>
         function printInvoice() {
@@ -83,11 +151,18 @@
     </script>
 </head>
 <body>
+<%
+    if (session.getAttribute("manager") != null) {
+%>
 <div class="logout-container">
     <form action="login.jsp" method="get">
         <button type="submit" class="logout-button">Đăng xuất</button>
     </form>
 </div>
+<%
+    }
+%>
+
 <h1>Hóa Đơn Nhập Hàng</h1>
 
 <div class="invoice-container">
@@ -138,6 +213,5 @@
         <a href="SelectSupplier.jsp"><button class="back">Quay lại</button></a>
     </div>
 </div>
-
 </body>
 </html>
