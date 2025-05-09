@@ -13,7 +13,6 @@ public class InvoiceDetailDAO extends DAO {
             stmt.setInt(3, detail.getQuantity());
             double totalPrice = detail.getPrice() * detail.getQuantity();
             stmt.setDouble(4, totalPrice);
-            stmt.setDouble(4, totalPrice);
             stmt.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
