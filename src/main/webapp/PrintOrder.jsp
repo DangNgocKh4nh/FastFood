@@ -197,6 +197,7 @@
         <p><strong>Tên:</strong> <%= order.getCustomer().getName() %></p>
         <p><strong>Số điện thoại:</strong> <%= order.getCustomer().getPhoneNumber() %></p>
         <p><strong>Địa chỉ:</strong> <%= address %></p>
+        <p><strong>Ngày đặt:</strong> <%=order.getCreateDate()%></p>
     </div>
 
     <div class="order-details">
