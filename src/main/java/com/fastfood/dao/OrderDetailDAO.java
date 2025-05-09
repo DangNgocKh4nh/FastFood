@@ -12,7 +12,8 @@ public class OrderDetailDAO extends DAO {
             ps.setInt(1, detail.getOrderId());
             ps.setInt(2, detail.getItem().getIdItem());
             ps.setInt(3, detail.getQuantity());
-            ps.setDouble(4, detail.getPrice());
+            double totalPrice = detail.getPrice() * detail.getQuantity();
+            ps.setDouble(4, totalPrice);
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
