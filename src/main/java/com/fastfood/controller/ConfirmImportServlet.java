@@ -49,12 +49,6 @@ public class ConfirmImportServlet extends HttpServlet {
             return;
         }
 
-        // Tính tổng tiền
-        double total = 0.0;
-        for (int i = 0; i < selectedIngredients.size(); i++) {
-            total += selectedIngredients.get(i).getPrice() * quantities.get(i);
-        }
-
         // Lấy thông tin quản lý từ session
         Manager manager = (Manager) session.getAttribute("manager");
         if (manager == null) {
@@ -73,29 +67,42 @@ public class ConfirmImportServlet extends HttpServlet {
             return;
         }
 
-        // Tạo Invoice
+        // Tạo Invoice và danh sách InvoiceDetail
         Invoice invoice = new Invoice();
         invoice.setImportDate(new Date());
-        invoice.setTotal(total);
         invoice.setManager(manager);
         invoice.setSupplier(supplier);
+
+        List<InvoiceDetail> invoiceDetails = new ArrayList<>();
+        for (int i = 0; i < selectedIngredients.size(); i++) {
+            InvoiceDetail detail = new InvoiceDetail();
+            detail.setQuantity(quantities.get(i));
+
+            // Lấy giá tùy chỉnh từ request, nếu không có thì dùng giá từ Ingredient
+            String customPriceParam = request.getParameter("price_" + i);
+            double price = selectedIngredients.get(i).getPrice(); // Giá mặc định từ Ingredient
+            if (customPriceParam != null && !customPriceParam.trim().isEmpty()) {
+                try {
+                    double customPrice = Double.parseDouble(customPriceParam);
+                    if (customPrice >= 0) {
+                        price = customPrice; // Sử dụng giá tùy chỉnh nếu hợp lệ
+                    } else {
+                        LOGGER.warning("Invalid custom price for ingredient " + i + ": " + customPriceParam);
+                    }
+                } catch (NumberFormatException e) {
+                    LOGGER.warning("Invalid number format for custom price " + i + ": " + customPriceParam);
+                }
+            }
+            detail.setPrice(price);
+            detail.setIngredient(selectedIngredients.get(i));
+            invoiceDetails.add(detail);
+        }
+        invoice.setInvoiceDetails(invoiceDetails);
 
         // Lưu Invoice và InvoiceDetail
         try {
             InvoiceDAO invoiceDAO = new InvoiceDAO();
             invoiceDAO.insertInvoice(invoice);
-
-            InvoiceDetailDAO detailDAO = new InvoiceDetailDAO();
-            for (int i = 0; i < selectedIngredients.size(); i++) {
-                InvoiceDetail detail = new InvoiceDetail();
-                detail.setIdInvoice(invoice.getIdInvoice());
-                detail.setQuantity(quantities.get(i));
-                detail.setPrice(selectedIngredients.get(i).getPrice());
-                List<Ingredient> ingredientList = new ArrayList<>();
-                ingredientList.add(selectedIngredients.get(i));
-                detail.setIngredients(ingredientList);
-                detailDAO.insertInvoiceDetail(detail);
-            }
 
             // Gửi dữ liệu qua request để hiển thị trên PrintInvoice.jsp
             request.setAttribute("selectedIngredients", selectedIngredients);

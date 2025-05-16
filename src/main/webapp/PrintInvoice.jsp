@@ -155,7 +155,7 @@
     if (session.getAttribute("manager") != null) {
 %>
 <div class="logout-container">
-    <form action="login.jsp" method="get">
+    <form action="LogoutServlet" method="post">
         <button type="submit" class="logout-button">Đăng xuất</button>
     </form>
 </div>
@@ -168,8 +168,8 @@
 <div class="invoice-container">
     <div class="invoice-header">
         <p><strong>Người nhập:</strong> <%= request.getAttribute("managerName") != null ? request.getAttribute("managerName") : "Không xác định" %></p>
-        <p><strong>Nhà cung cấp:</strong> <%= request.getAttribute("supplierName")!= null ? request.getAttribute("supplierName") : "Không xác định" %></p>
-        <p><strong>Ngày nhập:</strong> <%= new java.text.SimpleDateFormat("dd/MM/yyyy").format(new java.util.Date()) %></p>
+        <p><strong>Nhà cung cấp:</strong> <%= request.getAttribute("supplierName") != null ? request.getAttribute("supplierName") : "Không xác định" %></p>
+        <p><strong>Ngày nhập:</strong> <%= new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date()) %></p>
     </div>
 
     <table>
@@ -187,14 +187,14 @@
                 for (int i = 0; i < selectedIngredients.size(); i++) {
                     Ingredient ingredient = selectedIngredients.get(i);
                     int quantity = quantities.get(i);
-                    double subtotal = ingredient.getPrice() * quantity;
-                    total += subtotal;
+                    double lineTotal = ingredient.getPrice() * quantity;
+                    total += lineTotal;
         %>
         <tr>
             <td><%= ingredient.getName() %></td>
             <td><%= String.format("%.0f", ingredient.getPrice()) %></td>
             <td><%= quantity %></td>
-            <td><%= String.format("%.0f", subtotal) %></td>
+            <td><%= String.format("%.0f", lineTotal) %></td>
         </tr>
         <% } %>
         <% } else { %>

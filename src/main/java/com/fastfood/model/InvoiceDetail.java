@@ -1,21 +1,10 @@
 package com.fastfood.model;
 
-import java.util.List;
-
 public class InvoiceDetail {
     private int idInvoiceDetail;
-    private int idInvoice;
     private int quantity;
     private double price;
-    private List<Ingredient> ingredients;
-
-    public int getIdInvoice() {
-        return idInvoice;
-    }
-
-    public void setIdInvoice(int idInvoice) {
-        this.idInvoice = idInvoice;
-    }
+    private Ingredient ingredient;
 
     public int getIdInvoiceDetail() {
         return idInvoiceDetail;
@@ -41,11 +30,11 @@ public class InvoiceDetail {
         this.price = price;
     }
 
-    public List<Ingredient> getIngredients() {
-        return ingredients;
+    public Ingredient getIngredient() {
+        return ingredient;
     }
 
-    public void setIngredients(List<Ingredient> ingredients) {
-        this.ingredients = ingredients;
+    public void setIngredient(Ingredient ingredient) {
+        this.ingredient = ingredient;
     }
 }

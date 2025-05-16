@@ -50,14 +50,20 @@ public class ConfirmOrderServlet extends HttpServlet {
             if (quantityParam != null && !quantityParam.trim().isEmpty()) {
                 try {
                     int quantity = Integer.parseInt(quantityParam);
-                    detail.setQuantity(quantity);  // Cập nhật số lượng mới vào detail
+                    if (quantity > 0) {
+                        detail.setQuantity(quantity);  // Cập nhật số lượng mới vào detail
+                        total += detail.getPrice() * quantity;
+                    } else {
+                        response.sendRedirect("Payment.jsp?error=invalidQuantity");
+                        return;
+                    }
                 } catch (NumberFormatException e) {
-                    e.printStackTrace();
+                    response.sendRedirect("Payment.jsp?error=invalidQuantity");
+                    return;
                 }
+            } else {
+                total += detail.getPrice() * detail.getQuantity(); // Giữ nguyên số lượng cũ nếu không thay đổi
             }
-
-            // Tính tổng tiền cho mỗi chi tiết đơn hàng
-            total += detail.getPrice() * detail.getQuantity();
         }
 
         // Tạo đối tượng Order
@@ -70,23 +76,14 @@ public class ConfirmOrderServlet extends HttpServlet {
 
         // Tạo đối tượng OrderDAO để lưu đơn hàng vào cơ sở dữ liệu
         OrderDAO orderDAO = new OrderDAO();
-        int orderId = orderDAO.insertOrder(order);  // Lưu đơn hàng và lấy ID của đơn hàng mới
+        int orderId = orderDAO.insertOrder(order);  // Lưu đơn hàng và các chi tiết liên quan
 
         // Kiểm tra nếu lưu đơn hàng thành công
         if (orderId != -1) {
-            // Sau khi lưu đơn hàng, lưu các chi tiết đơn hàng
-            OrderDetailDAO detailDAO = new OrderDetailDAO();
-            for (int i = 0; i < orderDetails.size(); i++) {
-                OrderDetail detail = orderDetails.get(i);
-                detail.setOrderId(orderId); // Gán orderId cho từng chi tiết đơn hàng
-                // Lưu chi tiết đơn hàng vào cơ sở dữ liệu
-                detailDAO.insertOrderDetail(detail);
-            }
-
             // Xóa giỏ hàng (clear orderDetails trong session)
             session.removeAttribute("orderDetails");
 
-            // Chuyển tiếp đến trang PrintOrder.jsp để hiển thị thông tin đơn hàng
+            // Chuyển tiếp đến trang OrderSuccess.jsp để hiển thị thông tin đơn hàng
             request.setAttribute("order", order);
             request.setAttribute("orderId", orderId);
             request.setAttribute("address", address);

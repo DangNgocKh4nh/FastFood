@@ -1,20 +1,21 @@
 package com.fastfood.dao;
 
+import com.fastfood.model.Invoice;
 import com.fastfood.model.InvoiceDetail;
 
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 public class InvoiceDetailDAO extends DAO {
-    public void insertInvoiceDetail(InvoiceDetail detail) {
+    public void insertInvoiceDetail(Invoice invoice, InvoiceDetail detail) {
         String sql = "INSERT INTO invoicedetail (IdInvoice, IdIngredient, Quantity, Price) VALUES (?, ?, ?, ?)";
         try (PreparedStatement stmt = con.prepareStatement(sql)) {
-            stmt.setInt(1, detail.getIdInvoice());
-            stmt.setInt(2, detail.getIngredients().get(0).getIdIngredient());
+            stmt.setInt(1, invoice.getIdInvoice());
+            stmt.setInt(2, detail.getIngredient().getIdIngredient());
             stmt.setInt(3, detail.getQuantity());
-            double totalPrice = detail.getPrice() * detail.getQuantity();
-            stmt.setDouble(4, totalPrice);
+            stmt.setDouble(4, detail.getPrice()); // Lưu giá mỗi nguyên liệu, không nhân số lượng
             stmt.executeUpdate();
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }

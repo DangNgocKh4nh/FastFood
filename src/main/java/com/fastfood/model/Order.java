@@ -9,6 +9,7 @@ public class Order {
     private Date createDate;
     private Customer customer;
     private String address;
+    private List<OrderDetail> orderDetails;
 
     public String getAddress() {
         return address;
@@ -17,8 +18,6 @@ public class Order {
     public void setAddress(String address) {
         this.address = address;
     }
-
-    private List<OrderDetail> orderDetails;
 
     public int getIdOrder() {
         return idOrder;
