@@ -1,8 +1,6 @@
 package com.fastfood.controller;
 
-import com.fastfood.dao.CustomerDAO;
 import com.fastfood.dao.ItemDAO;
-import com.fastfood.model.Customer;
 import com.fastfood.model.Item;
 
 import com.fastfood.model.OrderDetail;
