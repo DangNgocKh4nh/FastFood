@@ -71,11 +71,19 @@
         .result-item form button:hover {
             background-color: #1976D2;
         }
-        .selected-item input[type="number"] {
+        .selected-item .quantity-input {
             width: 60px;
             padding: 5px;
             border: 1px solid #ccc;
             border-radius: 4px;
+            font-size: 14px;
+        }
+        .selected-item .price-input {
+            width: 120px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
         }
         .selected-item form button.cancel {
             background-color: #f44336;
@@ -129,32 +137,45 @@
             margin-bottom: 20px;
         }
     </style>
+    <%
+        String keywordValue = (String) request.getAttribute("keyword");
+        if (keywordValue == null) keywordValue = "";
+        String supplierId = request.getParameter("supplierId");
+        if (supplierId == null) supplierId = ""; // Gán giá trị mặc định nếu null
+    %>
     <script>
-        function updateQuantity(index, quantity, supplierId, keyword) {
+        function updateItem(index){
+            const qty  = document.getElementById("quantity-"+index).value;
+            const price= document.getElementById("price-"+index).value;
+            const supplierId = "<%= supplierId %>"; // Sử dụng giá trị đã kiểm tra
+            const keyword = "<%= keywordValue %>";
 
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "ImportServlet", true);
-            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+            console.log("Debug - supplierId:", supplierId); // Thêm log để debug
+            console.log("Debug - keyword:", keyword);
 
-            var data = "action=update&index=" + index + "&quantity=" + quantity +
-                "&supplierId=" + encodeURIComponent(supplierId) +
-                "&keyword=" + encodeURIComponent(keyword);
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST","ImportServlet",true);
+            xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+            xhr.setRequestHeader("X-Requested-With","XMLHttpRequest");
 
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    var response = JSON.parse(xhr.responseText);
-                    if (response.success) {
-                        // Cập nhật số lượng trên giao diện
-                        document.getElementById("quantity-" + response.index).value = response.quantity;
-                        // Cập nhật tổng tiền
-                        document.getElementById("total-box").textContent = "Tổng tiền: " + response.total + " VNĐ";
-                    } else {
-                        alert("Cập nhật số lượng thất bại!");
+            const data = "action=update"
+                + "&index="     + index
+                + "&quantity="  + qty
+                + "&price="     + price
+                + "&supplierId="+ encodeURIComponent(supplierId)
+                + "&keyword="   + encodeURIComponent(keyword);
+
+            xhr.onreadystatechange = function(){
+                if(xhr.readyState===4 && xhr.status===200){
+                    const res = JSON.parse(xhr.responseText);
+                    if(res.success){
+                        document.getElementById("total-box").textContent =
+                            "Tổng tiền: "+res.total+" VNĐ";
+                    }else{
+                        alert("Cập nhật thất bại!");
                     }
                 }
             };
-
             xhr.send(data);
         }
     </script>
@@ -240,22 +261,29 @@
     <div class="selected-item">
         <div>
             <strong><%= ingredient.getName() %></strong>
-            <p>Giá nhập: <%= String.format("%.0f", ingredient.getPrice()) %> VNĐ</p>
+            <p>
+                Giá nhập:
+                <input type="number"
+                       id="price-<%= i %>"
+                       value="<%= String.format("%.0f", ingredient.getPrice()) %>"
+                       min="0"
+                       step="1000"
+                       class="price-input"
+                       oninput="updateItem(<%= i %>)"> VNĐ
+            </p>
         </div>
         <div>
-            <form>
-                <input type="hidden" name="action" value="update">
+            <input type="number"
+                   id="quantity-<%= i %>"
+                   value="<%= quantity %>"
+                   min="1"
+                   class="quantity-input"
+                   oninput="updateItem(<%= i %>)">
+            <form action="ImportServlet" method="post" style="display:inline;">
+                <input type="hidden" name="action"  value="remove">
                 <input type="hidden" name="supplierId" value="<%= request.getParameter("supplierId") %>">
-                <input type="hidden" name="index" value="<%= i %>">
-                <input type="hidden" name="keyword" value="<%= keyword != null ? keyword : "" %>">
-                <input type="number" id="quantity-<%= i %>" name="quantity" value="<%= quantity %>" min="1"
-                       oninput="updateQuantity(<%= i %>, this.value, '<%= request.getParameter("supplierId") %>', '<%= keyword != null ? keyword : "" %>')">
-            </form>
-            <form action="ImportServlet" method="post">
-                <input type="hidden" name="action" value="remove">
-                <input type="hidden" name="supplierId" value="<%= request.getParameter("supplierId") %>">
-                <input type="hidden" name="index" value="<%= i %>">
-                <input type="hidden" name="keyword" value="<%= keyword != null ? keyword : "" %>">
+                <input type="hidden" name="index"   value="<%= i %>">
+                <input type="hidden" name="keyword" value="<%= keyword!=null?keyword:"" %>">
                 <button type="submit" class="cancel">Hủy</button>
             </form>
         </div>
@@ -279,6 +307,5 @@
     </form>
     <a href="SelectSupplier.jsp"><button class="back">Quay lại</button></a>
 </div>
-
 </body>
 </html>

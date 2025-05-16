@@ -57,29 +57,42 @@ public class ImportServlet extends HttpServlet {
                 quantities.add(1); // Mặc định số lượng là 1
             }
         } else if ("update".equals(action)) {
-            int index = Integer.parseInt(request.getParameter("index"));
+            int index    = Integer.parseInt(request.getParameter("index"));
             int quantity = Integer.parseInt(request.getParameter("quantity"));
-            if (quantity > 0 && index >= 0 && index < quantities.size()) {
-                quantities.set(index, quantity);
+            String priceParam = request.getParameter("price");  // <‑‑ MỚI
 
-                // Tính tổng tiền
-                double total = 0.0;
+            if (index>=0 && index<selectedIngredients.size()) {
+
+                // Cập nhật số lượng
+                if (quantity > 0) {
+                    quantities.set(index, quantity);
+                }
+
+                // Cập nhật giá nếu người dùng nhập
+                if (priceParam != null && !priceParam.trim().isEmpty()) {
+                    double newPrice = Double.parseDouble(priceParam);
+                    if (newPrice >= 0) {
+                        selectedIngredients.get(index).setPrice(newPrice);
+                    }
+                }
+
+                // Tính lại tổng
+                double total = 0;
                 for (int i = 0; i < selectedIngredients.size(); i++) {
                     total += selectedIngredients.get(i).getPrice() * quantities.get(i);
                 }
 
-                // Kiểm tra nếu là yêu cầu AJAX
+                // Phản hồi AJAX
                 if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
                     response.setContentType("application/json");
                     JSONObject json = new JSONObject();
                     json.put("success", true);
-                    json.put("index", index);
-                    json.put("quantity", quantity);
-                    json.put("total", total);
+                    json.put("total", String.format("%.0f", total));
                     response.getWriter().write(json.toString());
-                    return; // Kết thúc xử lý, không chuyển hướng
+                    return;
                 }
             } else {
+                // Trả lỗi cho AJAX
                 if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
                     response.setContentType("application/json");
                     JSONObject json = new JSONObject();
