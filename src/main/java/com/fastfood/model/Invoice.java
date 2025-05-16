@@ -6,7 +6,6 @@ import java.util.List;
 public class Invoice {
     private int idInvoice;
     private Date importDate;
-    private double total;
     private Manager manager;
     private Supplier supplier;
     private List<InvoiceDetail> invoiceDetails;
@@ -27,13 +26,6 @@ public class Invoice {
         this.importDate = importDate;
     }
 
-    public double getTotal() {
-        return total;
-    }
-
-    public void setTotal(double total) {
-        this.total = total;
-    }
 
     public Manager getManager() {
         return manager;
