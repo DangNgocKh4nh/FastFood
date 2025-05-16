@@ -1,6 +1,5 @@
 package com.fastfood.dao;
 
-import com.fastfood.model.Item;
 import com.fastfood.model.Supplier;
 import java.sql.*;
 import java.util.ArrayList;

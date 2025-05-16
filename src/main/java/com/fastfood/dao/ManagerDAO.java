@@ -1,7 +1,6 @@
 package com.fastfood.dao;
 
 import com.fastfood.model.Manager;
-import com.fastfood.model.Manager;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
