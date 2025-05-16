@@ -155,7 +155,7 @@
     if (session.getAttribute("manager") != null) {
 %>
 <div class="logout-container">
-    <form action="LogoutServlet" method="post">
+    <form action="login.jsp" method="get">
         <button type="submit" class="logout-button">Đăng xuất</button>
     </form>
 </div>
