@@ -229,7 +229,10 @@
 
     <div class="action-buttons">
         <button class="print" onclick="printInvoice()">In hóa đơn</button>
-        <a href="Order.jsp"><button class="back-button">Quay về menu</button></a>
+        <form action="ResetOrderServlet" method="post">
+            <button type="submit" class="back-button">Quay về menu</button>
+        </form>
+
     </div>
 </div>
 </body>
