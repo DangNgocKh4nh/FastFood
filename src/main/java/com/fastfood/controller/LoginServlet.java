@@ -42,7 +42,7 @@ public class LoginServlet extends HttpServlet {
                 if (manager != null) {
                     session.setAttribute("manager", manager); // Lưu Manager
                 }
-                response.sendRedirect("SelectSupplier.jsp");
+                response.sendRedirect("ManagerDashboard.jsp");
             } else {
                 response.sendRedirect("login.jsp?error=unknown_role");
             }

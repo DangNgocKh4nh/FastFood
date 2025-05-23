@@ -210,7 +210,7 @@
 
     <div class="action-buttons">
         <button class="print" onclick="printInvoice()">In hóa đơn</button>
-        <a href="SelectSupplier.jsp"><button class="back">Quay lại</button></a>
+        <a href="ManagerDashboard.jsp"><button class="back">Quay lại</button></a>
     </div>
 </div>
 </body>
