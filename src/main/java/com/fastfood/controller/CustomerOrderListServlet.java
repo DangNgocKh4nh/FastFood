@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 @WebServlet("/CustomerOrderListServlet")
@@ -23,8 +24,21 @@ public class CustomerOrderListServlet extends HttpServlet {
             return;
         }
 
+        // Lấy ngày bắt đầu và ngày kết thúc từ request
+        String startDateStr = request.getParameter("startDate");
+        String endDateStr = request.getParameter("endDate");
+
         CustomerRevenueStatsDAO statsDAO = new CustomerRevenueStatsDAO();
-        List<Order> orders = statsDAO.getOrdersByCustomerId(idCustomer);
+        List<Order> orders;
+        if (startDateStr == null || startDateStr.isEmpty() || endDateStr == null || endDateStr.isEmpty()) {
+            // Nếu không nhập ngày, lấy tất cả đơn hàng
+            orders = statsDAO.getOrdersByCustomerId(idCustomer);
+        } else {
+            // Chuyển đổi định dạng ngày (giả định định dạng yyyy-MM-dd)
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            orders = statsDAO.getOrdersByCustomerIdWithDateRange(idCustomer, startDateStr, endDateStr);
+        }
+
         request.setAttribute("orders", orders);
         request.setAttribute("idCustomer", idCustomer);
         request.getRequestDispatcher("CustomerOrderList.jsp").forward(request, response);

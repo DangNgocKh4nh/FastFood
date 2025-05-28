@@ -46,6 +46,10 @@ public class CustomerRevenueStatsDAO extends DAO {
     }
 
     public List<Order> getOrdersByCustomerId(int idCustomer) {
+        return getOrdersByCustomerIdWithDateRange(idCustomer, null, null);
+    }
+
+    public List<Order> getOrdersByCustomerIdWithDateRange(int idCustomer, String startDate, String endDate) {
         List<Order> orders = new ArrayList<>();
         String sql = "SELECT o.IdOrder, o.CreateDate, o.Address, " +
                 "od.IdOrderDetail, od.IdItem, i.Name AS ItemName, od.Quantity, od.Price " +
@@ -53,12 +57,22 @@ public class CustomerRevenueStatsDAO extends DAO {
                 "LEFT JOIN orderdetail od ON o.IdOrder = od.IdOrder " +
                 "LEFT JOIN item i ON od.IdItem = i.IdItem " +
                 "WHERE o.IdCustomer = ? " +
+                (startDate != null && !startDate.isEmpty() ? "AND o.CreateDate >= ? " : "") +
+                (endDate != null && !endDate.isEmpty() ? "AND o.CreateDate <= ? " : "") +
                 "ORDER BY o.CreateDate DESC";
 
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, idCustomer);
+            int paramIndex = 2;
+            if (startDate != null && !startDate.isEmpty()) {
+                ps.setString(paramIndex++, startDate + " 00:00:00");
+            }
+            if (endDate != null && !endDate.isEmpty()) {
+                ps.setString(paramIndex, endDate + " 23:59:59");
+            }
+            System.out.println("Executing query: " + sql + " with idCustomer: " + idCustomer + ", startDate: " + startDate + ", endDate: " + endDate);
+
             try (ResultSet rs = ps.executeQuery()) {
-                System.out.println("Executing query: " + sql + " with idCustomer: " + idCustomer);
                 Order currentOrder = null;
                 while (rs.next()) {
                     int orderId = rs.getInt("IdOrder");
@@ -71,9 +85,8 @@ public class CustomerRevenueStatsDAO extends DAO {
                         orders.add(currentOrder);
                     }
 
-                    // Thêm chi tiết đơn hàng nếu có
                     int orderDetailId = rs.getInt("IdOrderDetail");
-                    if (!rs.wasNull()) { // Kiểm tra nếu có chi tiết đơn hàng
+                    if (!rs.wasNull()) {
                         OrderDetail detail = new OrderDetail();
                         detail.setIdOrderDetail(orderDetailId);
                         Item item = new Item();
