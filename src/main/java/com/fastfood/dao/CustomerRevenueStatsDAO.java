@@ -14,7 +14,7 @@ import java.util.List;
 public class CustomerRevenueStatsDAO extends DAO {
     public List<CustomerRevenueStats> getCustomerRevenueStats() {
         List<CustomerRevenueStats> statsList = new ArrayList<>();
-        String sql = "SELECT c.IdCustomer, c.Name, c.PhoneNumber, c.Email, COALESCE(SUM(od.Price), 0) AS revenue " +
+        String sql = "SELECT c.IdCustomer, c.Name, c.PhoneNumber, c.Email, COALESCE(SUM(od.Quantity * od.Price), 0) AS revenue " +
                 "FROM customer c " +
                 "LEFT JOIN `order` o ON c.IdCustomer = o.IdCustomer " +
                 "LEFT JOIN orderdetail od ON o.IdOrder = od.IdOrder " +
@@ -48,7 +48,7 @@ public class CustomerRevenueStatsDAO extends DAO {
     public List<Order> getOrdersByCustomerId(int idCustomer) {
         List<Order> orders = new ArrayList<>();
         String sql = "SELECT o.IdOrder, o.CreateDate, o.Address, " +
-                "od.IdOrderDetail, od.IdItem, i.Name AS ItemName, od.Quantity, i.Price " +
+                "od.IdOrderDetail, od.IdItem, i.Name AS ItemName, od.Quantity, od.Price " +
                 "FROM `order` o " +
                 "LEFT JOIN orderdetail od ON o.IdOrder = od.IdOrder " +
                 "LEFT JOIN item i ON od.IdItem = i.IdItem " +
