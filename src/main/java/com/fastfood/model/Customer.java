@@ -1,38 +1,26 @@
 package com.fastfood.model;
 
-public class Customer {
+public class Customer extends User {
     private int idCustomer;
-    private int idUser; // kết nối với bảng User
     private String name;
     private String phoneNumber;
     private String email;
 
-    // Constructor mặc định
     public Customer() {
     }
 
-    // Thêm constructor với 4 tham số
     public Customer(int idCustomer, String name, String phone, String email) {
         this.idCustomer = idCustomer;
         this.name = name;
         this.phoneNumber = phone;
         this.email = email;
     }
-    // Getter & Setter
     public int getIdCustomer() {
         return idCustomer;
     }
 
     public void setIdCustomer(int idCustomer) {
         this.idCustomer = idCustomer;
-    }
-
-    public int getIdUser() {
-        return idUser;
-    }
-
-    public void setIdUser(int idUser) {
-        this.idUser = idUser;
     }
 
     public String getName() {

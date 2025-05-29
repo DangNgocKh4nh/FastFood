@@ -36,9 +36,12 @@ public class CustomerOrderListServlet extends HttpServlet {
         } else {
             // Chuyển đổi định dạng ngày (giả định định dạng yyyy-MM-dd)
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            orders = statsDAO.getOrdersByCustomerIdWithDateRange(idCustomer, startDateStr, endDateStr);
+            orders = statsDAO.getOrdersByDate(idCustomer, startDateStr, endDateStr);
         }
 
+        // Gửi lại các giá trị startDate và endDate để hiển thị trong form
+        request.setAttribute("startDate", startDateStr);
+        request.setAttribute("endDate", endDateStr);
         request.setAttribute("orders", orders);
         request.setAttribute("idCustomer", idCustomer);
         request.getRequestDispatcher("CustomerOrderList.jsp").forward(request, response);

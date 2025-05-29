@@ -119,6 +119,27 @@
             background-color: #e9ecef;
             transition: background-color 0.3s ease;
         }
+        .logout-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        .logout-button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2);
+        }
+        .logout-button:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(220, 53, 69, 0.3);
+        }
         .action-buttons {
             display: flex;
             justify-content: center;
@@ -180,14 +201,19 @@
     </style>
 </head>
 <body>
+<div class="logout-container">
+    <form action="login.jsp" method="get">
+        <button type="submit" class="logout-button">Đăng xuất</button>
+    </form>
+</div>
 <h1>Danh Sách Đơn Hàng Của Khách Hàng (Mã KH: <%= request.getAttribute("idCustomer") %>)</h1>
 <div class="order-container">
     <form action="CustomerOrderListServlet" method="get" class="filter-form">
         <input type="hidden" name="idCustomer" value="<%= request.getAttribute("idCustomer") %>">
         <label for="startDate">Ngày bắt đầu:</label>
-        <input type="date" id="startDate" name="startDate" value="">
+        <input type="date" id="startDate" name="startDate" value="<%= request.getAttribute("startDate") != null ? request.getAttribute("startDate") : "" %>">
         <label for="endDate">Ngày kết thúc:</label>
-        <input type="date" id="endDate" name="endDate" value="">
+        <input type="date" id="endDate" name="endDate" value="<%= request.getAttribute("endDate") != null ? request.getAttribute("endDate") : "" %>">
         <button type="submit">Xem</button>
     </form>
     <%

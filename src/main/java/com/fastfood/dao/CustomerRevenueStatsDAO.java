@@ -46,10 +46,10 @@ public class CustomerRevenueStatsDAO extends DAO {
     }
 
     public List<Order> getOrdersByCustomerId(int idCustomer) {
-        return getOrdersByCustomerIdWithDateRange(idCustomer, null, null);
+        return getOrdersByDate(idCustomer, null, null);
     }
 
-    public List<Order> getOrdersByCustomerIdWithDateRange(int idCustomer, String startDate, String endDate) {
+    public List<Order> getOrdersByDate(int idCustomer, String startDate, String endDate) {
         List<Order> orders = new ArrayList<>();
         String sql = "SELECT o.IdOrder, o.CreateDate, o.Address, " +
                 "od.IdOrderDetail, od.IdItem, i.Name AS ItemName, od.Quantity, od.Price " +

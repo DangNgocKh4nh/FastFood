@@ -68,7 +68,6 @@ public class ConfirmOrderServlet extends HttpServlet {
 
         // Tạo đối tượng Order
         Order order = new Order();
-        order.setTotal(total);
         order.setCreateDate(new Date());
         order.setCustomer(customer);
         order.setAddress(address);

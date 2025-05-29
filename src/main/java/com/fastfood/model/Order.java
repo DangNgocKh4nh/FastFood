@@ -5,7 +5,6 @@ import java.util.List;
 
 public class Order {
     private int idOrder;
-    private double total;
     private Date createDate;
     private Customer customer;
     private String address;
@@ -25,14 +24,6 @@ public class Order {
 
     public void setIdOrder(int idOrder) {
         this.idOrder = idOrder;
-    }
-
-    public double getTotal() {
-        return total;
-    }
-
-    public void setTotal(double total) {
-        this.total = total;
     }
 
     public Date getCreateDate() {
