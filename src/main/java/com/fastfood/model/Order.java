@@ -8,6 +8,7 @@ public class Order {
     private Date createDate;
     private Customer customer;
     private String address;
+    private String paymentMethod;
     private List<OrderDetail> orderDetails;
 
     public String getAddress() {
@@ -48,5 +49,13 @@ public class Order {
 
     public void setOrderDetails(List<OrderDetail> orderDetails) {
         this.orderDetails = orderDetails;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 }

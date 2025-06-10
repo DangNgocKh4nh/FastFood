@@ -1,95 +1,89 @@
 package com.fastfood.controller;
 
 import com.fastfood.dao.OrderDAO;
-import com.fastfood.dao.OrderDetailDAO;
-import com.fastfood.model.Customer;
-import com.fastfood.model.Order;
-import com.fastfood.model.OrderDetail;
-
+import com.fastfood.model.*;
+import com.fastfood.payment.*;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
 import java.io.IOException;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet("/ConfirmOrderServlet")
 public class ConfirmOrderServlet extends HttpServlet {
-
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Lấy session hiện tại
         HttpSession session = request.getSession();
-
-        // Lấy danh sách chi tiết đơn hàng từ session
-        List<OrderDetail> orderDetails = (List<OrderDetail>) session.getAttribute("orderDetails");
-        // Lấy thông tin khách hàng từ session
         Customer customer = (Customer) session.getAttribute("customer");
+        List<OrderDetail> orderDetails = (List<OrderDetail>) session.getAttribute("orderDetails");
 
-        // Kiểm tra nếu không có chi tiết đơn hàng hoặc khách hàng
-        if (orderDetails == null || customer == null) {
-            response.sendRedirect("Order.jsp?error=missingData");
+        if (customer == null || orderDetails == null || orderDetails.isEmpty()) {
+            response.sendRedirect("Payment.jsp?error=saveFail");
             return;
         }
 
-        // Lấy địa chỉ từ request
         String address = request.getParameter("address");
-
-        // Kiểm tra xem địa chỉ có được nhập không
         if (address == null || address.trim().isEmpty()) {
             response.sendRedirect("Payment.jsp?error=missingAddress");
             return;
         }
 
-        // Tính tổng tiền đơn hàng và cập nhật lại số lượng cho các chi tiết đơn hàng
-        double total = 0;
-        for (int i = 0; i < orderDetails.size(); i++) {
-            OrderDetail detail = orderDetails.get(i);
-
-            // Lấy số lượng từ request
-            String quantityParam = request.getParameter("quantity_" + i);
-            if (quantityParam != null && !quantityParam.trim().isEmpty()) {
-                try {
-                    int quantity = Integer.parseInt(quantityParam);
-                    if (quantity > 0) {
-                        detail.setQuantity(quantity);  // Cập nhật số lượng mới vào detail
-                        total += detail.getPrice() * quantity;
-                    } else {
-                        response.sendRedirect("Payment.jsp?error=invalidQuantity");
-                        return;
-                    }
-                } catch (NumberFormatException e) {
-                    response.sendRedirect("Payment.jsp?error=invalidQuantity");
-                    return;
-                }
-            } else {
-                total += detail.getPrice() * detail.getQuantity(); // Giữ nguyên số lượng cũ nếu không thay đổi
-            }
+        String paymentMethod = request.getParameter("paymentMethod");
+        PaymentProvider provider;
+        switch (paymentMethod) {
+            case "Momo":
+                provider = new MomoPayment();
+                break;
+            case "ZaloPay":
+                provider = new ZaloPayPayment();
+                break;
+            case "InternetBanking":
+                provider = new InternetBankingPayment();
+                break;
+            case "COD":
+            default:
+                provider = new CODPayment();
+                break;
         }
 
-        // Tạo đối tượng Order
-        Order order = new Order();
-        order.setCreateDate(new Date());
-        order.setCustomer(customer);
-        order.setAddress(address);
-        order.setOrderDetails(orderDetails);
+        OrderPayment payment = new OrderPayment(provider);
+        double total = 0;
+        List<OrderDetail> updatedOrderDetails = new ArrayList<>();
+        for (int i = 0; i < orderDetails.size(); i++) {
+            OrderDetail detail = orderDetails.get(i);
+            int quantity = Integer.parseInt(request.getParameter("quantity_" + i));
+            detail.setQuantity(quantity);
+            total += detail.getPrice() * quantity;
+            updatedOrderDetails.add(detail); // Cập nhật danh sách
+        }
 
-        // Tạo đối tượng OrderDAO để lưu đơn hàng vào cơ sở dữ liệu
-        OrderDAO orderDAO = new OrderDAO();
-        int orderId = orderDAO.insertOrder(order);  // Lưu đơn hàng và các chi tiết liên quan
+        try {
+            boolean paymentSuccess = payment.processPayment(total);
+            if (paymentSuccess) {
+                Order order = new Order();
+                order.setCustomer(customer);
+                order.setAddress(address);
+                order.setCreateDate(new java.util.Date());
+                order.setOrderDetails(updatedOrderDetails);
+                order.setPaymentMethod(paymentMethod); // Gán phương thức thanh toán
 
-        // Kiểm tra nếu lưu đơn hàng thành công
-        if (orderId != -1) {
-            // Xóa giỏ hàng (clear orderDetails trong session)
-            session.removeAttribute("orderDetails");
+                // Lưu order vào cơ sở dữ liệu
+                OrderDAO orderDAO = new OrderDAO();
+                orderDAO.insertOrder(order);
 
-            // Chuyển tiếp đến trang OrderSuccess.jsp để hiển thị thông tin đơn hàng
-            request.setAttribute("order", order);
-            request.setAttribute("orderId", orderId);
-            request.setAttribute("address", address);
-            request.getRequestDispatcher("PrintOrder.jsp").forward(request, response);
-        } else {
-            // Nếu lưu đơn hàng không thành công, chuyển về trang Payment.jsp với thông báo lỗi
-            response.sendRedirect("Payment.jsp?error=saveFail");
+                // Truyền dữ liệu sang OrderConfirmation.jsp
+                request.setAttribute("order", order);
+                request.setAttribute("address", address);
+                request.getRequestDispatcher("PrintOrder.jsp").forward(request, response);
+            } else {
+                response.sendRedirect("Payment.jsp?error=paymentFailed");
+            }
+        } catch (PaymentException e) {
+            response.sendRedirect("Payment.jsp?error=paymentFailed");
         }
     }
 }

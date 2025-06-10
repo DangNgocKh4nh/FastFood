@@ -24,25 +24,30 @@
     <title>Thanh toán</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
             margin: 40px;
-            background-color: #f4f6f8;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
         }
         .container {
             max-width: 1000px;
-            margin: 0 auto;
+            width: 100%;
+            padding: 20px;
         }
         h2, h3 {
             text-align: center;
             color: #2c3e50;
             margin-bottom: 20px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
         }
-        .customer-info, .order-details {
-            background-color: white;
+        .customer-info, .order-details, .payment-section {
+            background-color: #fff;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
         }
         .customer-info p {
@@ -57,15 +62,15 @@
         }
         .address-container label {
             display: block;
-            font-weight: bold;
+            font-weight: 500;
             margin-bottom: 8px;
-            color: #2c3e50;
+            color: #34495e;
         }
         .address-container textarea {
             width: 100%;
             padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
             font-size: 16px;
             resize: vertical;
             transition: border-color 0.3s;
@@ -77,7 +82,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            background-color: white;
+            background-color: #fff;
             border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
@@ -90,7 +95,7 @@
         th {
             background-color: #2c3e50;
             color: white;
-            font-weight: bold;
+            font-weight: 600;
         }
         tr:last-child td {
             border-bottom: none;
@@ -114,9 +119,29 @@
         .total-amount {
             text-align: right;
             font-size: 18px;
-            font-weight: bold;
+            font-weight: 600;
             margin: 20px 0;
             color: #2c3e50;
+        }
+        .payment-section {
+            padding: 15px;
+        }
+        .payment-section label {
+            font-weight: 500;
+            color: #34495e;
+            margin-right: 10px;
+        }
+        .payment-section select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            width: 200px;
+            transition: border-color 0.3s;
+        }
+        .payment-section select:focus {
+            border-color: #28a745;
+            outline: none;
         }
         .action-buttons {
             display: flex;
@@ -130,7 +155,9 @@
             border-radius: 6px;
             cursor: pointer;
             font-size: 16px;
-            transition: background-color 0.3s;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         .confirm-button {
             background-color: #28a745;
@@ -138,6 +165,8 @@
         }
         .confirm-button:hover {
             background-color: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(40, 167, 69, 0.3);
         }
         .back-button {
             background-color: #007bff;
@@ -145,6 +174,8 @@
         }
         .back-button:hover {
             background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 123, 255, 0.3);
         }
         .logout-container {
             position: absolute;
@@ -159,15 +190,18 @@
             border-radius: 6px;
             cursor: pointer;
             font-size: 14px;
-            transition: background-color 0.3s;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2);
         }
         .logout-button:hover {
             background-color: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(220, 53, 69, 0.3);
         }
         .error-message {
             text-align: center;
             color: #dc3545;
-            font-weight: bold;
+            font-weight: 500;
             margin: 10px 0;
             background-color: #ffe6e6;
             padding: 10px;
@@ -180,7 +214,7 @@
             .container {
                 padding: 0 10px;
             }
-            .customer-info, .order-details {
+            .customer-info, .order-details, .payment-section {
                 padding: 15px;
             }
             table {
@@ -192,6 +226,9 @@
             .quantity-input {
                 width: 50px;
                 font-size: 12px;
+            }
+            .payment-section select {
+                width: 100%;
             }
             .action-buttons {
                 flex-direction: column;
@@ -215,7 +252,7 @@
             rows.forEach(row => {
                 const price = parseFloat(row.dataset.price);
                 const qtyInput = row.querySelector(".quantity-input");
-                const quantity = parseInt(qtyInput.value);
+                const quantity = parseInt(qtyInput.value) || 0;
                 const lineTotal = price * quantity;
                 row.querySelector(".line-total").innerText = lineTotal.toFixed(0) + " VNĐ";
                 total += lineTotal;
@@ -228,6 +265,7 @@
             qtyInputs.forEach(input => {
                 input.addEventListener("input", updateTotal);
             });
+            updateTotal(); // Cập nhật tổng ban đầu
         });
     </script>
 </head>
@@ -281,6 +319,16 @@
             <strong>Tổng thanh toán:</strong> <span id="totalAmount"><%= String.format("%.0f", total) %> VNĐ</span>
         </div>
 
+        <div class="payment-section">
+            <label for="paymentMethod">Phương thức thanh toán:</label>
+            <select id="paymentMethod" name="paymentMethod" required>
+                <option value="COD">Thanh toán khi nhận hàng (COD)</option>
+                <option value="Momo">Momo</option>
+                <option value="ZaloPay">ZaloPay</option>
+                <option value="InternetBanking">Internet Banking</option>
+            </select>
+        </div>
+
         <input type="hidden" name="detailCount" value="<%= orderDetails.size() %>">
 
         <%
@@ -292,6 +340,10 @@
         } else if ("saveFail".equals(error)) {
         %>
         <div class="error-message">Có lỗi xảy ra khi lưu đơn hàng. Vui lòng thử lại sau.</div>
+        <%
+        } else if ("paymentFailed".equals(error)) {
+        %>
+        <div class="error-message">Thanh toán không thành công. Vui lòng thử lại.</div>
         <%
             }
         %>

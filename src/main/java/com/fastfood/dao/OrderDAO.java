@@ -8,11 +8,12 @@ import java.sql.*;
 public class OrderDAO extends DAO {
     public int insertOrder(Order order) {
         int generatedId = -1;
-        String sql = "INSERT INTO `order` (CreateDate, IdCustomer, Address) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO `order` (CreateDate, IdCustomer, Address, PaymentMethod) VALUES (?, ?, ?, ?)";
         try (PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setTimestamp(1, new Timestamp(order.getCreateDate().getTime()));
             ps.setInt(2, order.getCustomer().getIdCustomer());
             ps.setString(3, order.getAddress());
+            ps.setString(4, order.getPaymentMethod());
             ps.executeUpdate();
 
             try (ResultSet rs = ps.getGeneratedKeys()) {
