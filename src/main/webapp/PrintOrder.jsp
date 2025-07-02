@@ -135,6 +135,16 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 6px rgba(0, 123, 255, 0.3);
         }
+        img {
+            max-width: 100px;
+            max-height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        img {
+            max-width: 50px;
+            max-height: 50px;
+        }
         .print {
             background-color: #2196F3;
             color: white;
@@ -236,6 +246,7 @@
         <h3>Chi tiết đơn hàng</h3>
         <table>
             <tr>
+                <th>Hình ảnh</th>
                 <th>Tên món</th>
                 <th>Số lượng</th>
                 <th>Giá (VNĐ)</th>
@@ -246,6 +257,12 @@
                 double lineTotal = detail.getQuantity() * detail.getPrice();
             %>
             <tr>
+                <td>
+                    <%
+                        String imagePath = item.getImage() != null ? item.getImage() : "/images/default.jpg";
+                    %>
+                    <img src="<%= request.getContextPath() + imagePath %>" alt="<%= item.getName() %>" onerror="this.src='<%= request.getContextPath() + "/images/default.jpg" %>';">
+                </td>
                 <td><%= item.getName() %></td>
                 <td><%= detail.getQuantity() %></td>
                 <td><%= String.format("%,.0f", detail.getPrice()) %></td>

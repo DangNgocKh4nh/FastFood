@@ -52,7 +52,7 @@ public class CustomerRevenueStatsDAO extends DAO {
     public List<Order> getOrdersByDate(int idCustomer, String startDate, String endDate) {
         List<Order> orders = new ArrayList<>();
         String sql = "SELECT o.IdOrder, o.CreateDate, o.Address, " +
-                "od.IdOrderDetail, od.IdItem, i.Name AS ItemName, od.Quantity, od.Price " +
+                "od.IdOrderDetail, od.IdItem, i.Name, i.Image AS ItemName, od.Quantity, od.Price " +
                 "FROM `order` o " +
                 "LEFT JOIN orderdetail od ON o.IdOrder = od.IdOrder " +
                 "LEFT JOIN item i ON od.IdItem = i.IdItem " +

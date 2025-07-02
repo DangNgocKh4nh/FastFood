@@ -123,6 +123,16 @@
             margin: 20px 0;
             color: #2c3e50;
         }
+        img {
+            max-width: 100px;
+            max-height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        img {
+            max-width: 50px;
+            max-height: 50px;
+        }
         .payment-section {
             padding: 15px;
         }
@@ -294,6 +304,7 @@
         <h3>Thông tin đơn hàng</h3>
         <table>
             <tr>
+                <th>Hình ảnh</th>
                 <th>Tên món</th>
                 <th>Giá</th>
                 <th>Số lượng</th>
@@ -304,6 +315,12 @@
                 Item item = detail.getItem();
             %>
             <tr class="order-row" data-price="<%= item.getPrice() %>">
+                <td>
+                    <%
+                        String imagePath = item.getImage() != null ? item.getImage() : "/images/default.jpg";
+                    %>
+                    <img src="<%= request.getContextPath() + imagePath %>" alt="<%= item.getName() %>" onerror="this.src='<%= request.getContextPath() + "/images/default.jpg" %>';">
+                </td>
                 <td><%= item.getName() %></td>
                 <td><%= String.format("%.0f", item.getPrice()) %> VNĐ</td>
                 <td>

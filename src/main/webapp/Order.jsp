@@ -138,6 +138,12 @@
         .logout-button:hover {
             background-color: #c82333;
         }
+        img {
+            max-width: 100px;
+            max-height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
         @media (max-width: 600px) {
             body {
                 margin: 20px;
@@ -162,6 +168,10 @@
             button {
                 padding: 6px 12px;
                 font-size: 12px;
+            }
+            img {
+                max-width: 50px;
+                max-height: 50px;
             }
             .logout-container {
                 position: static;
@@ -196,12 +206,19 @@
     <h3>Kết quả tìm kiếm</h3>
     <table>
         <tr>
+            <th>Hình ảnh</th>
             <th>Tên</th>
             <th>Giá</th>
             <th>Chọn</th>
         </tr>
         <% for (Item item : resultItems) { %>
         <tr>
+            <td>
+                <%
+                    String imagePath = item.getImage() != null ? item.getImage() : "/images/default.jpg";
+                %>
+                <img src="<%= request.getContextPath() + imagePath %>" alt="<%= item.getName() %>" onerror="this.src='<%= request.getContextPath() + "/images/default.jpg" %>';">
+            </td>
             <td><%= item.getName() %></td>
             <td><%= String.format("%.0f", item.getPrice()) %> VNĐ</td>
             <td>
@@ -223,12 +240,19 @@
     <h3>Món đã chọn</h3>
     <table>
         <tr>
+            <th>Hình ảnh</th>
             <th>Tên</th>
             <th>Giá</th>
             <th>Hủy</th>
         </tr>
         <% for (Item item : selectedItems) { %>
         <tr>
+            <td>
+                <%
+                    String imagePath = item.getImage() != null ? item.getImage() : "/images/default.jpg";
+                %>
+                <img src="<%= request.getContextPath() + imagePath %>" alt="<%= item.getName() %>" onerror="this.src='<%= request.getContextPath() + "/images/default.jpg" %>';">
+            </td>
             <td><%= item.getName() %></td>
             <td><%= String.format("%.0f", item.getPrice()) %> VNĐ</td>
             <td>

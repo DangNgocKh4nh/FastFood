@@ -17,9 +17,10 @@ public class ItemDAO extends DAO {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Item item = new Item();
-                    item.setIdItem(rs.getInt("IdItem"));   // Sửa tên cột
+                    item.setIdItem(rs.getInt("IdItem"));
                     item.setName(rs.getString("Name"));
                     item.setPrice(rs.getDouble("Price"));
+                    item.setImage(rs.getString("Image"));
                     itemList.add(item);
                 }
             }
@@ -30,8 +31,6 @@ public class ItemDAO extends DAO {
         return itemList;
     }
 
-
-    // Phương thức để lấy món ăn theo ID
     public Item getItemById(int id) {
         Item item = null;
         String sql = "SELECT * FROM item WHERE IdItem = ?";
@@ -44,6 +43,7 @@ public class ItemDAO extends DAO {
                     item.setIdItem(rs.getInt("IdItem"));
                     item.setName(rs.getString("Name"));
                     item.setPrice(rs.getDouble("Price"));
+                    item.setImage(rs.getString("Image"));
                 }
             }
         } catch (SQLException e) {
