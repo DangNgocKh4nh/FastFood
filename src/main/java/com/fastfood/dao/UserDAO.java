@@ -4,6 +4,7 @@ import com.fastfood.model.User;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class UserDAO extends DAO {
 
@@ -32,9 +33,6 @@ public class UserDAO extends DAO {
 
         return user;
     }
-
-
-
     public void register(User user) {
         if (this.con == null) {
             System.out.println("Connection is null");
@@ -42,15 +40,20 @@ public class UserDAO extends DAO {
         }
 
         String sql = "INSERT INTO User (Username, Password, Role) VALUES (?, ?, ?)";
-
-        try (PreparedStatement stmt = con.prepareStatement(sql)) {
+        try (PreparedStatement stmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, user.getUsername());
             stmt.setString(2, user.getPassword());
-            stmt.setString(3, user.getRole()); // Role như "Customer"
+            stmt.setString(3, user.getRole());
 
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("User registered successfully.");
+                try (ResultSet rs = stmt.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        int idUser = rs.getInt(1);
+                        user.setIdUser(idUser);
+                    }
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();

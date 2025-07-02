@@ -77,9 +77,12 @@
         <input type="text" name="username" placeholder="Tên đăng nhập" required>
         <input type="password" name="password" placeholder="Mật khẩu" required>
         <input type="password" name="confirmPassword" placeholder="Xác nhận mật khẩu" required>
+        <input type="text" name="name" placeholder="Họ tên" required>
+        <input type="text" name="phoneNumber" placeholder="Số điện thoại" required>
+        <input type="text" name="email" placeholder="Email" required>
         <button type="submit">Đăng ký</button>
     </form>
-    <a href="login.jsp"><button class="back">Quay lại</button></a>
+    <a href="login.jsp"><button>Quay lại</button></a>
 </div>
 
 </body>

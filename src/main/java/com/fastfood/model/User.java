@@ -1,7 +1,7 @@
 package com.fastfood.model;
 
 public class User {
-    private int idUser;      // Thêm thuộc tính idUser
+    private int idUser;
     private String username;
     private String password;
     private String role;

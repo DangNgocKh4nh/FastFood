@@ -2,6 +2,7 @@ package com.fastfood.model;
 
 public class Customer extends User {
     private int idCustomer;
+    private int idUser;
     private String name;
     private String phoneNumber;
     private String email;
@@ -22,7 +23,13 @@ public class Customer extends User {
     public void setIdCustomer(int idCustomer) {
         this.idCustomer = idCustomer;
     }
+    public int getIdUser() {
+        return idUser;
+    }
 
+    public void setIdUser(int idUser) {
+        this.idUser = idUser;
+    }
     public String getName() {
         return name;
     }
