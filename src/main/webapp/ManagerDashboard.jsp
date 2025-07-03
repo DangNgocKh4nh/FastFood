@@ -114,6 +114,9 @@
     <div class="dashboard-item">
         <a href="CustomerStatsServlet">Thống Kê Khách Hàng</a>
     </div>
+    <div class="dashboard-item">
+        <a href="ItemServlet">Manager CMS</a>
+    </div>
 </div>
 <form action="login.jsp" method="get" style="margin-top: 20px;">
     <button type="submit" class="logout-button">Đăng Xuất</button>
