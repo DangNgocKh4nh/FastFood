@@ -9,6 +9,7 @@ public class Order {
     private Customer customer;
     private String address;
     private String paymentMethod;
+    private String state;
     private List<OrderDetail> orderDetails;
 
     public String getAddress() {
@@ -57,5 +58,13 @@ public class Order {
 
     public void setPaymentMethod(String paymentMethod) {
         this.paymentMethod = paymentMethod;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 }

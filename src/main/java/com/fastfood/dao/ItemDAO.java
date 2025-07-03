@@ -32,25 +32,22 @@ public class ItemDAO extends DAO {
     }
 
     public Item getItemById(int id) {
-        Item item = null;
         String sql = "SELECT * FROM item WHERE IdItem = ?";
-
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, id);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    item = new Item();
-                    item.setIdItem(rs.getInt("IdItem"));
-                    item.setName(rs.getString("Name"));
-                    item.setPrice(rs.getDouble("Price"));
-                    item.setImage(rs.getString("Image"));
-                }
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Item item = new Item();
+                item.setIdItem(rs.getInt("IdItem"));
+                item.setName(rs.getString("Name"));
+                item.setPrice(rs.getDouble("Price"));
+                item.setImage(rs.getString("Image"));
+                return item;
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        return item;
+        return null;
     }
     public void addItem(Item item) {
         String sql = "INSERT INTO item (Name, Price, Image) VALUES (?, ?, ?)";

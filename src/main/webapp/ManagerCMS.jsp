@@ -1,5 +1,6 @@
 <%@ page import="com.fastfood.model.Item" %>
 <%@ page import="java.util.List" %>
+<%@ page import="com.fastfood.model.Order" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html>
@@ -11,23 +12,84 @@
             font-family: Arial, sans-serif;
             background-color: #f4f6f9;
             margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px 0;
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .sidebar h3 {
+            padding: 15px 20px;
+            margin: 0;
+            font-size: 1.2em;
+            background-color: #34495e;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+        .sidebar ul li {
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .sidebar ul li:hover {
+            background-color: #34495e;
+        }
+        .sidebar ul li.active {
+            background-color: #3498db;
+        }
+        .sidebar .menu-buttons {
+            padding-top: 20px;
+            border-top: 1px solid #34495e;
+        }
+        .sidebar .menu-buttons button {
+            display: block;
+            width: 100%;
+            padding: 10px 20px;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: background-color 0.3s;
+        }
+        .sidebar .menu-buttons button:hover {
+            background-color: #c0392b;
+        }
+        .sidebar .menu-buttons .back-button {
+            background-color: #007bff;
+        }
+        .sidebar .menu-buttons .back-button:hover {
+            background-color: #0056b3;
+        }
+        .content {
+            margin-left: 250px;
             padding: 20px;
+            width: calc(100% - 250px);
+            overflow-y: auto;
         }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        h2 {
-            color: #2c3e50;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .form-container {
+        .form-container, .order-form-container {
             background-color: #fff;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             margin-bottom: 20px;
+            display: none;
+        }
+        .form-container.active, .order-form-container.active {
+            display: block;
         }
         .form-group {
             margin-bottom: 15px;
@@ -98,37 +160,12 @@
         td .delete-btn:hover {
             background-color: #c0392b;
         }
-        .logout-container {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-        }
-        .logout-button {
-            background-color: #e74c3c;
+        td .update-btn {
+            background-color: #9b59b6;
             color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
         }
-        .logout-button:hover {
-            background-color: #c0392b;
-        }
-        .back-container {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-        }
-        .back-button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .back-button:hover {
-            background-color: #0056b3;
+        td .update-btn:hover {
+            background-color: #8e44ad;
         }
         img {
             max-width: 50px;
@@ -136,8 +173,15 @@
             object-fit: cover;
             border-radius: 4px;
         }
-        @media (max-width: 600px) {
-            .form-container, .table-container {
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+            .content {
+                margin-left: 200px;
+                width: calc(100% - 200px);
+            }
+            .form-container, .order-form-container, .table-container {
                 padding: 10px;
             }
             th, td {
@@ -174,23 +218,62 @@
                 window.location.href = 'ItemServlet?action=delete&id=' + id;
             }
         }
+
+        function updateOrder(orderId) {
+            var paymentMethod = document.getElementById('paymentMethod_' + orderId).value;
+            var state = document.getElementById('state_' + orderId).value;
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', 'ItemServlet?action=updateOrder&orderId=' + orderId + '&paymentMethod=' + paymentMethod + '&state=' + state, true);
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    alert('Cập nhật đơn hàng thành công!');
+                } else {
+                    alert('Cập nhật đơn hàng thất bại!');
+                }
+            };
+            xhr.send();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuItems = document.querySelectorAll('.sidebar ul li');
+            const contents = document.querySelectorAll('.content > div');
+
+            menuItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    menuItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    contents.forEach(content => content.classList.remove('active'));
+                    const targetId = this.getAttribute('data-target');
+                    document.getElementById(targetId).classList.add('active');
+                });
+            });
+
+            if (menuItems.length > 0) {
+                menuItems[0].click();
+            }
+        });
     </script>
 </head>
 <body>
-<div class="logout-container">
-    <form action="login.jsp" method="get">
-        <button type="submit" class="logout-button">Đăng Xuất</button>
-    </form>
+<div class="sidebar">
+    <h3>Menu</h3>
+    <ul>
+        <li data-target="itemSection">Quản lý món ăn</li>
+        <li data-target="orderSection">Quản lý đơn hàng</li>
+    </ul>
+    <div class="menu-buttons">
+        <form action="ManagerDashboard.jsp">
+            <button type="submit" class="back-button">Quay lại</button>
+        </form>
+        <form action="login.jsp" method="get">
+            <button type="submit" class="logout-button">Đăng Xuất</button>
+        </form>
+    </div>
 </div>
-<div class="back-container">
-    <form action="ManagerDashboard.jsp">
-        <button type="submit" class="back-button">Quay lại</button>
-    </form>
-</div>
-<div class="container">
-    <h2>Quản lý món ăn</h2>
-
-    <div class="form-container">
+<div class="content">
+    <div id="itemSection" class="form-container active">
+        <h2>Quản lý món ăn</h2>
         <form action="ItemServlet" method="post" enctype="multipart/form-data">
             <input type="hidden" id="itemId" name="id">
             <input type="hidden" id="action" name="action" value="add">
@@ -204,60 +287,111 @@
             </div>
             <div class="form-group">
                 <label for="itemImage">Ảnh:</label>
-                <input type="file" id="itemImage" name="imageFile" accept="image/*" required>
+                <input type="file" id="itemImage" name="imageFile" accept="image/*">
             </div>
             <div class="form-group">
                 <button type="submit" id="submitBtn">Thêm mới</button>
                 <button type="button" onclick="resetForm()">Làm mới</button>
             </div>
         </form>
+        <div class="table-container">
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Tên món</th>
+                    <th>Giá</th>
+                    <th>Hình ảnh</th>
+                    <th>Hành động</th>
+                </tr>
+                <%
+                    List<Item> items = (List<Item>) request.getAttribute("items");
+                    if (items != null && !items.isEmpty()) {
+                        for (Item item : items) {
+                %>
+                <tr>
+                    <td><%= item.getIdItem() %></td>
+                    <td><%= item.getName() %></td>
+                    <td><%= String.format("%.0f", item.getPrice()) %> VNĐ</td>
+                    <td>
+                        <img src="<%= request.getContextPath() + (item.getImage() != null ? item.getImage() : "/images/default.jpg") %>"
+                             alt="<%= item.getName() %>"
+                             onerror="this.src='<%= request.getContextPath() + "/images/default.jpg" %>';">
+                    </td>
+                    <td>
+                        <button class="edit-btn"
+                                onclick="editItem('<%= item.getIdItem() %>', '<%= item.getName() %>', '<%= item.getPrice() %>', '<%= item.getImage() %>')">
+                            Sửa
+                        </button>
+                        <button class="delete-btn" onclick="confirmDelete('<%= item.getIdItem() %>')">Xóa</button>
+                    </td>
+                </tr>
+                <%
+                    }
+                } else {
+                %>
+                <tr>
+                    <td colspan="5">Không có item nào. Vui lòng thêm item mới hoặc kiểm tra kết nối cơ sở dữ liệu.</td>
+                </tr>
+                <%
+                    }
+                %>
+            </table>
+        </div>
     </div>
 
-    <div class="table-container">
-        <table>
-            <tr>
-                <th>ID</th>
-                <th>Tên món</th>
-                <th>Giá</th>
-                <th>Hình ảnh</th>
-                <th>Hành động</th>
-            </tr>
-            <%
-                List<Item> items = (List<Item>) request.getAttribute("items");
-                if (items != null && !items.isEmpty()) {
-                    for (Item item : items) {
-            %>
-            <tr>
-                <td><%= item.getIdItem() %></td>
-                <td><%= item.getName() %></td>
-                <td><%= String.format("%.0f", item.getPrice()) %> VNĐ</td>
-                <td>
-                    <img src="<%= request.getContextPath() + (item.getImage() != null ? item.getImage() : "/images/default.jpg") %>"
-                         alt="<%= item.getName() %>"
-                         onerror="this.src='<%= request.getContextPath() + "/images/default.jpg" %>';">
-                </td>
-                <td>
-                    <button class="edit-btn"
-                            onclick="editItem('<%= item.getIdItem() %>', '<%= item.getName() %>', '<%= item.getPrice() %>', '<%= item.getImage() %>')">
-                        Sửa
-                    </button>
-                    <button class="delete-btn" onclick="confirmDelete('<%= item.getIdItem() %>')">Xóa</button>
-                </td>
-            </tr>
-            <%
-                }
-            } else {
-            %>
-            <tr>
-                <td colspan="5">Không có item nào. Vui lòng thêm item mới hoặc kiểm tra kết nối cơ sở dữ liệu.</td>
-            </tr>
-            <%
-                }
-            %>
-        </table>
+    <div id="orderSection" class="order-form-container">
+        <h2>Quản lý đơn hàng</h2>
+        <div class="table-container">
+            <table>
+                <tr>
+                    <th>ID Đơn Hàng</th>
+                    <th>Ngày đặt hàng</th>
+                    <th>Địa chỉ</th>
+                    <th>Phương Thức Thanh Toán</th>
+                    <th>Trạng Thái</th>
+                    <th>Hành Động</th>
+                </tr>
+                <%
+                    List<Order> orders = (List<Order>) request.getAttribute("orders");
+                    if (orders != null && !orders.isEmpty()) {
+                        for (Order order : orders) {
+                %>
+                <tr>
+                    <td><%= order.getIdOrder() %></td>
+                    <td><%= order.getCreateDate() %></td>
+                    <td><%= order.getAddress() %></td>
+                    <td>
+                        <select id="paymentMethod_<%= order.getIdOrder() %>" name="paymentMethod">
+                            <option value="COD" <%= "COD".equals(order.getPaymentMethod()) ? "selected" : "" %>>COD</option>
+                            <option value="Momo" <%= "Momo".equals(order.getPaymentMethod()) ? "selected" : "" %>>Momo</option>
+                            <option value="ZaloPay" <%= "ZaloPay".equals(order.getPaymentMethod()) ? "selected" : "" %>>ZaloPay</option>
+                            <option value="InternetBanking" <%= "InternetBanking".equals(order.getPaymentMethod()) ? "selected" : "" %>>Internet Banking</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select id="state_<%= order.getIdOrder() %>" name="state">
+                            <option value="Preparing" <%= "Preparing".equals(order.getState()) ? "selected" : "" %>>Đang chuẩn bị</option>
+                            <option value="Delivering" <%= "Delivering".equals(order.getState()) ? "selected" : "" %>>Đang giao hàng</option>
+                            <option value="Delivered" <%= "Delivered".equals(order.getState()) ? "selected" : "" %>>Đã giao hàng</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button class="update-btn" onclick="updateOrder('<%= order.getIdOrder() %>')">Cập nhật</button>
+                    </td>
+                </tr>
+                <%
+                    }
+                } else {
+                %>
+                <tr>
+                    <td colspan="4">Không có đơn hàng nào. Vui lòng kiểm tra kết nối cơ sở dữ liệu.</td>
+                </tr>
+                <%
+                    }
+                %>
+            </table>
+        </div>
     </div>
-
 </div>
-
 </body>
 </html>
