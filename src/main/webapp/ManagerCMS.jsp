@@ -20,13 +20,12 @@
             width: 250px;
             background-color: #2c3e50;
             color: white;
-            padding: 20px 0;
             position: fixed;
             height: 100%;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            /*justify-content: space-between;*/
         }
         .sidebar h3 {
             padding: 15px 20px;
@@ -37,6 +36,7 @@
         .sidebar ul {
             list-style: none;
             padding: 0;
+            margin: 0;
         }
         .sidebar ul li {
             padding: 15px 20px;
